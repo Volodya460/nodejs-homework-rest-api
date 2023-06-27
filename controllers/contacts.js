@@ -26,9 +26,15 @@ const getById = async (req, res) => {
 
 const post = async (req, res) => {
   const { _id: owner } = req.user;
-  const result = await Contact.create({ ...req.body, owner });
+  const { email } = req.body;
+  const FindUser = await Contact.findOne({ email });
 
-  res.status(201).json(result);
+  if (!FindUser) {
+    const result = await Contact.create({ ...req.body, owner });
+    res.status(201).json(result);
+  } else {
+    throw HttpError(409, "Contact already exists");
+  }
 };
 
 const deleteById = async (req, res) => {
